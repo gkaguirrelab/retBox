@@ -35,7 +35,7 @@ if ~isfield(params,'gridPoints')
 end
 % List of sigma values (degrees visual angle)
 if ~isfield(params,'sigList')
-    params.sigList      = 1;
+    params.sigList      = 0.5:0.5:10;
 end
 % TR
 if ~isfield(params,'TR')
@@ -72,9 +72,9 @@ tmpx0                   = x(:);
 tmpy0                   = y(:);
 X                       = x(:);
 Y                       = y(:);
-x0                      = repmat(tmpx0,size(params.sigList,1),1);
-y0                      = repmat(tmpy0,size(params.sigList,1),1);
-sigs                    = repmat(params.sigList,size(tmpx0,1),1);
+x0                      = repmat(tmpx0,size(params.sigList,2),1);
+y0                      = repmat(tmpy0,size(params.sigList,2),1);
+sigs                    = repmat(params.sigList,1,size(tmpx0,1))';
 %% resample images to sampling grid
 disp('Resampling images to search grid...')
 nImages = size(padImages, 3);
