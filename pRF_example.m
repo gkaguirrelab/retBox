@@ -12,8 +12,10 @@ sessionDir              = '/data/jag/TOME/TOME_3001/081916a';
 anatTemplate            = fullfile(sessionDir,'anat_templates','lh.areas.anat.nii.gz');
 subjectName             = 'TOME_3001';
 %% load the data
-params.stimData         = fullfile(dataDir,'pRFimages.mat');
-params.obsData          = fullfile(dataDir,'V1tc.mat');
+tmp                     = load(fullfile(dataDir,'pRFimages.mat'));
+params.stimData         = tmp.imagesFull;
+tmp                     = load(fullfile(dataDir,'V1tc.mat'));
+params.obsData          = tmp.V1tc;
 %%
 pRFs = pRF(params);
 

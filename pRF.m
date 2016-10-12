@@ -3,12 +3,29 @@ function pRFs = pRF(params)
 %   Calculates population receptive fields
 %
 %   Usage:
+%       pRFs = pRF(params)
 %
 %   Required:
-%       params.stimData
-%       params.obsData
+%       params.stimData     - X x Y x frame matrix of stimulus images 
+%       params.obsData      - N x TR fMRI time-series data
 %
-%
+%   Defaults:
+%       params.fieldSize    = 19.6129;                      % Radius of stimuluated visual field (degrees visual angle)
+%       params.padFactor    = 1;                            % Padding outside of the stimulated visual field
+%       params.screenRes    = [1920 1080];                  % Screen resolution (pixels)
+%       params.framesPerTR  = 8;                            % Frames per TR
+%       params.gridPoints   = 101;                          % Search grid points
+%       params.sigList      = 0.5:0.5:10;                   % List of sigma values (degrees visual angle)
+%       params.TR           = 0.8;                          % TR
+%       params.HRF          = doubleGammaHrf(params.TR);    % HRF
+%  
+%   Outputs:
+%       pRF.x0              - x position
+%       pRF.y0              - y position
+%       pRF.sig             - sigma value
+%       pRF.co              - correlation (measure of fit)
+%       pRF.pol             - polar angle
+%       pRF.ecc             - eccentricity 
 %
 %   Written by Andrew S Bock Oct 2016
 
@@ -19,7 +36,7 @@ if ~isfield(params,'fieldSize')
 end
 % Padding outside of the stimulated visual field
 if ~isfield(params,'padFactor')
-    params.padFactor    = 2;
+    params.padFactor    = 1;
 end
 % Screen resolution (pixels)
 if ~isfield(params,'screenRes')
@@ -45,14 +62,10 @@ end
 if ~isfield(params,'HRF')
     params.HRF          = doubleGammaHrf(params.TR);
 end
-%% load the data
-disp('Loading stimulus and observed data...');
-stimData                = load(params.stimData);
-obsData                 = load(params.obsData);
 %% Binarize the stimulus
 disp('Binarizing the stimulus images...');
-stim                    = 0.*stimData.imagesFull;
-oneImage                = stimData.imagesFull ~= 128; % not background
+stim                    = 0.*params.stimData;
+oneImage                = params.stimData ~= 128; % not background
 stim(oneImage)          = 1;
 %% Average the frames within each TR
 start                   = 1:params.framesPerTR:size(stim,3);
@@ -130,13 +143,13 @@ for n=1:length(predvals)
     progBar(n);
 end
 %% Find pRFs
-progBar                 = ProgressBar(size(obsData.V1tc,1),'calculating pRFs...');
-pRFs.x0                 = nan(size(obsData.V1tc,1),1);
-pRFs.y0                 = nan(size(obsData.V1tc,1),1);
-pRFs.sig                = nan(size(obsData.V1tc,1),1);
-pRFs.co                 = nan(size(obsData.V1tc,1),1);
-for i = 1:size(obsData.V1tc,1)
-    pRFcorrs            = corr(obsData.V1tc(i,:)',predTCs);
+progBar                 = ProgressBar(size(params.obsData,1),'calculating pRFs...');
+pRFs.x0                 = nan(size(params.obsData,1),1);
+pRFs.y0                 = nan(size(params.obsData,1),1);
+pRFs.sig                = nan(size(params.obsData,1),1);
+pRFs.co                 = nan(size(params.obsData,1),1);
+for i = 1:size(params.obsData,1)
+    pRFcorrs            = corr(params.obsData(i,:)',predTCs);
     [co,bestInd]        = max(pRFcorrs);
     pRFs.x0(i)          = x0(bestInd);
     pRFs.y0(i)          = y0(bestInd);
