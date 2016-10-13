@@ -16,10 +16,10 @@ tmp                     = load(fullfile(dataDir,'pRFimages.mat'));
 params.stimData         = tmp.imagesFull;
 tmp                     = load(fullfile(dataDir,'V1tc.mat'));
 params.obsData          = tmp.V1tc;
-%%
+%% Calculate pRFs
 pRFs = pRF(params);
 
-%% Plot pRFs
+%% Get the indices (if not entire surface or volume)
 a                       = load_nifti(anatTemplate);
 V1ind                   = find(abs(a.vol)==1);
 ecc                     = nan(size(a.vol));
@@ -30,7 +30,7 @@ ecc(V1ind)              = pRFs.ecc;
 pol(V1ind)              = pRFs.pol;
 co(V1ind)               = pRFs.co; 
 sig(V1ind)              = pRFs.sig;
-%%
+%% Plot the pRFs
 surface_plot('ecc',ecc,subjectName);
 surface_plot('pol',pol,subjectName);
 surface_plot('co',co,subjectName);

@@ -7,12 +7,11 @@ function pRFs = pRF(params)
 %
 %   Required:
 %       params.stimData     - X x Y x frame matrix of stimulus images 
-%       params.obsData      - N x TR fMRI time-series data
+%       params.obsData      - N x TR matrix of fMRI time-series data
 %
 %   Defaults:
-%       params.fieldSize    = 19.6129;                      % Radius of stimuluated visual field (degrees visual angle)
-%       params.padFactor    = 1;                            % Padding outside of the stimulated visual field
-%       params.screenRes    = [1920 1080];                  % Screen resolution (pixels)
+%       params.fieldSize    = 10.4346;                      % Radius of stimuluated visual field (degrees visual angle)
+%       params.padFactor    = 0.25;                         % Proportion of image to use as padding outside of the stimulated visual field
 %       params.framesPerTR  = 8;                            % Frames per TR
 %       params.gridPoints   = 101;                          % Search grid points
 %       params.sigList      = 0.5:0.5:10;                   % List of sigma values (degrees visual angle)
@@ -23,7 +22,7 @@ function pRFs = pRF(params)
 %       pRF.x0              - x position
 %       pRF.y0              - y position
 %       pRF.sig             - sigma value
-%       pRF.co              - correlation (measure of fit)
+%       pRF.co              - correlation (calculated during fit)
 %       pRF.pol             - polar angle
 %       pRF.ecc             - eccentricity 
 %
@@ -32,15 +31,11 @@ function pRFs = pRF(params)
 %% set defaults
 % Radius of stimuluated visual field (degrees visual angle)
 if ~isfield(params,'fieldSize')
-    params.fieldSize    = 19.6129;
+    params.fieldSize    = 10.4346;
 end
 % Padding outside of the stimulated visual field
 if ~isfield(params,'padFactor')
-    params.padFactor    = 1;
-end
-% Screen resolution (pixels)
-if ~isfield(params,'screenRes')
-    params.screenRes    = [1920 1080];
+    params.padFactor    = 0.25;
 end
 % Frames per TR
 if ~isfield(params,'framesPerTR')
@@ -68,6 +63,7 @@ stim                    = 0.*params.stimData;
 oneImage                = params.stimData ~= 128; % not background
 stim(oneImage)          = 1;
 %% Average the frames within each TR
+disp('Calculating the mean image per TR...');
 start                   = 1:params.framesPerTR:size(stim,3);
 stop                    = start(2)-1:params.framesPerTR:size(stim,3);
 meanImages              = nan(size(stim,1),size(stim,2),size(stim,3)/params.framesPerTR);
@@ -75,11 +71,12 @@ for i = 1:length(start)
     meanImages(:,:,i) = mean(stim(:,:,start(i):stop(i)),3);
 end
 %% Add black around stimulus region, to model the actual visual field (not just the bars)
-padImages = padarray(meanImages,(params.padFactor/2)*[(params.screenRes(2)/2) (params.screenRes(2)/2)]);
+disp('Padding the stimulus images...');
+padImages = padarray(meanImages,(params.padFactor/2)*[size(meanImages,1) size(meanImages,2)]);
 
 %% Create X, Y, and sigma
-tmpgrid                 = linspace(-params.fieldSize*params.padFactor,...
-    params.fieldSize*params.padFactor,params.gridPoints);
+tmpgrid                 = linspace(-params.fieldSize - (params.fieldSize*params.padFactor),...
+    params.fieldSize + (params.fieldSize*params.padFactor),params.gridPoints);
 [x,y]                   = meshgrid(tmpgrid,tmpgrid);
 tmpx0                   = x(:);
 tmpy0                   = y(:);
