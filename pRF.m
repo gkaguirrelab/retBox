@@ -6,7 +6,7 @@ function pRFs = pRF(params)
 %       pRFs = pRF(params)
 %
 %   Required:
-%       params.stimData     - X x Y x frame matrix of stimulus images 
+%       params.stimData     - X x Y x frame matrix of stimulus images
 %       params.obsData      - N x TR matrix of fMRI time-series data
 %
 %   Defaults:
@@ -17,14 +17,14 @@ function pRFs = pRF(params)
 %       params.sigList      = 0.5:0.5:10;                   % List of sigma values (degrees visual angle)
 %       params.TR           = 0.8;                          % TR
 %       params.HRF          = doubleGammaHrf(params.TR);    % HRF
-%  
+%
 %   Outputs:
 %       pRF.x0              - x position
 %       pRF.y0              - y position
 %       pRF.sig             - sigma value
 %       pRF.co              - correlation (calculated during fit)
 %       pRF.pol             - polar angle
-%       pRF.ecc             - eccentricity 
+%       pRF.ecc             - eccentricity
 %
 %   Written by Andrew S Bock Oct 2016
 
@@ -93,25 +93,16 @@ for ii = 1:nImages
     tmp_im = imresize(padImages(:,:,ii), [params.gridPoints params.gridPoints]);
     images(:, ii) = tmp_im(:);
 end
-%% Break up search grid into smaller matrices
+%% Break up the prediction loop into small chunks
 nn = numel(x0); % grid points
-[predPerTask,predTasks] = calc_tasks(nn,ceil(nn/1000));
-predidx = [];
-for i = 1:predTasks
-    if isempty(predidx);
-        predidx = [1,predPerTask(i)];
-    else
-        predidx = [predidx;[predidx(end,2)+1,predidx(end,2)+predPerTask(i)]];
-    end
-    predvals{i} = predidx(i,1):predidx(i,2);
-end
+ind = break_up_matrix(nn,1000);
 %% Make predicted timecoures from stimulus images
 predTCs                 = nan(size(images))';
-progBar                 = ProgressBar(length(predvals),'making predictions...');
-for n=1:length(predvals)
-    tSigs               = sigs(predvals{n},:);
-    tx0                 = x0(predvals{n});
-    ty0                 = y0(predvals{n});
+progBar                 = ProgressBar(length(ind),'making predictions...');
+for n=1:length(ind)
+    tSigs               = sigs(ind{n},:);
+    tx0                 = x0(ind{n});
+    ty0                 = y0(ind{n});
     % Allow x, y, sigma to be a matrix so that the final output will be
     % size(X,1) by size(x0,2). This way we can make many RFs at the same time.
     if numel(tSigs)~=1,
@@ -136,22 +127,25 @@ for n=1:length(predvals)
     % Set timecourses with very little variation (var<0.1) to flat
     pred                = set_to_flat(pred);
     % store the predictions
-    predTCs(:,predvals{n}) = pred;
+    predTCs(:,ind{n}) = pred;
     progBar(n);
 end
+%% Break up the observation loop into small chunks
+nn = size(params.obsData,1); % number of voxels/vertices
+ind = break_up_matrix(nn,1000);
 %% Find pRFs
-progBar                 = ProgressBar(size(params.obsData,1),'calculating pRFs...');
+progBar                 = ProgressBar(length(ind),'calculating pRFs...');
 pRFs.x0                 = nan(size(params.obsData,1),1);
 pRFs.y0                 = nan(size(params.obsData,1),1);
 pRFs.sig                = nan(size(params.obsData,1),1);
 pRFs.co                 = nan(size(params.obsData,1),1);
-for i = 1:size(params.obsData,1)
-    pRFcorrs            = corr(params.obsData(i,:)',predTCs);
-    [co,bestInd]        = max(pRFcorrs);
-    pRFs.x0(i)          = x0(bestInd);
-    pRFs.y0(i)          = y0(bestInd);
-    pRFs.sig(i)         = sigs(bestInd);
-    pRFs.co(i)          = co;
-    if ~mod(i,100);progBar(i);end
+for i = 1:length(ind)
+        pRFcorrs            = corr(params.obsData(ind{i},:)',predTCs);
+        [co,bestInd]        = max(pRFcorrs,[],2);
+        pRFs.x0(ind{i})    = x0(bestInd);
+        pRFs.y0(ind{i})    = y0(bestInd);
+        pRFs.sig(ind{i})   = sigs(bestInd);
+        pRFs.co(ind{i})    = co;
+    if ~mod(i,10);progBar(i);end
 end
 [pRFs.pol,pRFs.ecc] = cart2pol(pRFs.x0,pRFs.y0);
