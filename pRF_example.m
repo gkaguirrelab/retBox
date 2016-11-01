@@ -11,21 +11,13 @@ b                       = find_bold(sessionDir);
 runNum                  = 1;
 matName                 = 'tfMRI_RETINO_PA_run01.mat';
 func                    = 'wdrf.tf.surf.lh';
-inVol                   = fullfile(sessionDir,b{runNum},[func '.nii.gz']);
-inImages                = fullfile(sessionDir,'Stimuli',matName);
-%% load the data
-ims                     = load(inImages);
-params.stimData         = ims.params.stimParams.imagesFull;
-tcs                     = load_nifti(inVol);
-dims                    = size(tcs.vol);
-if length(dims)>2
-    tmpTcs              = reshape(tcs.vol,dims(1)*dims(2)*dims(3),dims(4));
-    params.obsData          = tmpTcs;
-else
-    params.obsData          = tcs.vol;
-end
-%% Calculate pRFs
-pRFs = pRF(params);
+params.inVol            = fullfile(sessionDir,b{runNum},[func '.nii.gz']);
+params.stimFile         = fullfile(sessionDir,'Stimuli',matName);
+params.outDir           = fullfile(sessionDir,'pRFs');
+params.baseName         = 'lh';
+
+%% Calculate pRFs, save maps
+pRFs                    = makePRFmaps(params);
 
 %% Plot the pRFs
 % Threshold by fit
@@ -38,7 +30,7 @@ ecc(~goodInd)           = nan;
 pol(~goodInd)           = nan;
 co(~goodInd)            = nan;
 sig(~goodInd)           = nan;
-% Make plots
+% Visualize maps
 surface_plot('ecc',ecc,subjectName);
 surface_plot('pol',pol,subjectName);
 surface_plot('co',co,subjectName);
