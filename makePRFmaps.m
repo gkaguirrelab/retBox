@@ -9,13 +9,13 @@ function pRFs = makePRFmaps(params)
 %       params.stimFile     - '/full/path/to/stimFile.mat'
 %       params.inVol        - '/full/path/to/inVol.nii.gz'
 %       params.outDir       - '/full/path/to/outDir'
-%       params.outBase      - 'baseName' (e.g. 'lh');
+%       params.outBase      - output base name (e.g. 'lh');
 %
 %   Outputs:
-%       fullfile(outDir,[params.baseName '.ecc.nii.gz'])
-%       fullfile(outDir,[params.baseName '.pol.nii.gz'])
-%       fullfile(outDir,[params.baseName '.sig.nii.gz'])
-%       fullfile(outDir,[params.baseName '.co.nii.gz'])
+%       fullfile(outDir,[params.outBase '.ecc.nii.gz'])
+%       fullfile(outDir,[params.outBase '.pol.nii.gz'])
+%       fullfile(outDir,[params.outBase '.sig.nii.gz'])
+%       fullfile(outDir,[params.outBase '.co.nii.gz'])
 %
 %   Written by Andrew S Bock Nov 2016
 
@@ -52,13 +52,13 @@ outNii                  = tcs;
 outNii.dim(5)           = 1;
 % eccentricity
 outNii.vol              = outEcc;
-save_nifti(outNii,fullfile(params.outDir,[params.baseName '.ecc.nii.gz']));
+save_nifti(outNii,fullfile(params.outDir,[params.outBase '.ecc.nii.gz']));
 % polar angle
 outNii.vol              = outPol;
-save_nifti(outNii,fullfile(params.outDir,[params.baseName '.pol.nii.gz']));
+save_nifti(outNii,fullfile(params.outDir,[params.outBase '.pol.nii.gz']));
 % sigma
 outNii.vol              = outSig;
-save_nifti(outNii,fullfile(params.outDir,[params.baseName '.sig.nii.gz']));
+save_nifti(outNii,fullfile(params.outDir,[params.outBase '.sig.nii.gz']));
 % correlation
 outNii.vol              = outCo;
-save_nifti(outNii,fullfile(params.outDir,[params.baseName '.co.nii.gz']));
+save_nifti(outNii,fullfile(params.outDir,[params.outBase '.co.nii.gz']));
