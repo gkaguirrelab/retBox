@@ -132,7 +132,7 @@ for n=1:length(ind)
 end
 %% Break up the observation loop into small chunks
 nn = size(params.obsData,1); % number of voxels/vertices
-ind = break_up_matrix(nn,1000);
+ind = break_up_matrix(nn,500);
 %% Find pRFs
 progBar                 = ProgressBar(length(ind),'calculating pRFs...');
 pRFs.x0                 = nan(size(params.obsData,1),1);
