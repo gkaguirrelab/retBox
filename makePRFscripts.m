@@ -11,7 +11,7 @@ function makePRFscripts(params)
 %       params.stimFile     - '/full/path/to/stimFile.mat'
 %       params.inVol        - '/full/path/to/inVol.nii.gz'
 %       params.outDir       - '/full/path/to/outDir'
-%       params.outBase      - output base name (e.g. 'lh');
+%       params.baseName     - output base name (e.g. 'lh');
 %
 %   Optional:
 %       params.sigList      - vector of sigma sizes (e.g. 0.5:0.1:10);
@@ -33,7 +33,7 @@ fprintf(fid,'#!/bin/bash\n');
 matlab_string = '"';
 matlab_string = [matlab_string 'params.stimFile=''' params.stimFile ''';' ...
     'params.inVol=''' params.inVol ''';params.outDir=''' params.outDir ''';' ...
-    'params.outBase=''' params.outBase ''';'];
+    'params.baseName=''' params.baseName ''';'];
 if isfield(params,'sigList')
     matlab_string   = [matlab_string 'params.sigList=[' num2str(params.sigList) '];'];
 end
