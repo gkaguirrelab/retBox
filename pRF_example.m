@@ -4,22 +4,27 @@
 %
 %   Written by Andrew S Bock Oct 2016
 
-%% Set inputs
+%% Run on the UPenn cluster
+params.sessionDir   = '/data/jag/TOME/TOME_3005/100316';
+params.logDir       = '/data/jag/TOME/LOGS';
+makePRFshellScripts(params)
+
+%% Run locally
+% Set inputs
 subjectName             = 'TOME_3001';
 sessionDir              = '/data/jag/TOME/TOME_3001/081916b';
 b                       = find_bold(sessionDir);
 runNum                  = 1;
+hemi                    = 'lh';
 matName                 = 'tfMRI_RETINO_PA_run01.mat';
-func                    = 'wdrf.tf.surf.lh';
+func                    = ['wdrf.tf.surf.' hemi];
 params.inVol            = fullfile(sessionDir,b{runNum},[func '.nii.gz']);
 params.stimFile         = fullfile(sessionDir,'Stimuli',matName);
 params.outDir           = fullfile(sessionDir,'pRFs');
-params.baseName         = 'lh';
-
-%% Calculate pRFs, save maps
+params.baseName         = sprintf([hemi '.run%02d'],runNum);
+% Calculate pRFs, save maps
 pRFs                    = makePRFmaps(params);
-
-%% Plot the pRFs
+% Plot the pRFs
 % Threshold by fit
 goodInd                 = pRFs.co>=sqrt(0.05);
 ecc                     = pRFs.ecc;
