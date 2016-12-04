@@ -18,7 +18,7 @@ hemis                   = {'lh','rh'};
 % Get the retinotopy runs and stimulus files
 b                       = listdir(fullfile(params.sessionDir,'*RETINO*'),'dirs');
 stimFiles               = listdir(fullfile(params.sessionDir,'Stimuli','*RETINO*'),'files');
-% run `makePRFmaps
+% Loop through retinotopy runs and hemispheres, making pRF maps
 for i = 1:length(b)
     for hh = 1:length(hemis)
         thisStim        = find(~cellfun('isempty',strfind(stimFiles,sprintf('run%02d',i))));
