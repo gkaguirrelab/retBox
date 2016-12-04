@@ -5,8 +5,8 @@
 %   Written by Andrew S Bock Oct 2016
 
 %% Run on the UPenn cluster
-params.sessionDir   = '/data/jag/TOME/TOME_3005/100316';
-params.logDir       = '/data/jag/TOME/LOGS';
+params.sessionDir       = '/data/jag/TOME/TOME_3005/100316';
+params.logDir           = '/data/jag/TOME/LOGS';
 makePRFshellScripts(params)
 
 %% Run locally
@@ -24,20 +24,20 @@ for i = 1:length(b)
         thisStim        = find(~cellfun('isempty',strfind(stimFiles,sprintf('run%02d',i))));
         params.stimFile = fullfile(params.sessionDir,'Stimuli',stimFiles{thisStim});
         params.inVol    = fullfile(params.sessionDir,b{i},['wdrf.tf.surf.' hemis{hh} '.nii.gz']);
-        params.baseName         = sprintf([hemis{hh} '.run%02d'],i);
+        params.baseName = sprintf([hemis{hh} '.run%02d'],i);
         % Calculate pRFs, save maps
-        pRFs                    = makePRFmaps(params);
+        pRFs            = makePRFmaps(params);
         % Plot the pRFs
         % Threshold by fit
-        goodInd                 = pRFs.co>=sqrt(0.05);
-        ecc                     = pRFs.ecc;
-        pol                     = pRFs.pol;
-        co                      = pRFs.co;
-        sig                     = pRFs.sig;
-        ecc(~goodInd)           = nan;
-        pol(~goodInd)           = nan;
-        co(~goodInd)            = nan;
-        sig(~goodInd)           = nan;
+        goodInd         = pRFs.co>=sqrt(0.05);
+        ecc             = pRFs.ecc;
+        pol             = pRFs.pol;
+        co              = pRFs.co;
+        sig             = pRFs.sig;
+        ecc(~goodInd)   = nan;
+        pol(~goodInd)   = nan;
+        co(~goodInd)    = nan;
+        sig(~goodInd)   = nan;
         % Visualize maps
         surface_plot('ecc',ecc,subjectName);
         surface_plot('pol',pol,subjectName);
