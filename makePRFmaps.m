@@ -35,7 +35,7 @@ pRFs                    = pRF(params);
 
 %% Save output maps
 if ~exist(params.outDir,'dir')
-    mkdir(params.outdir);
+    mkdir(params.outDir);
 end
 if length(dims)>2
     outEcc              = reshape(pRFs.ecc,dims(1),dims(2),dims(3));
