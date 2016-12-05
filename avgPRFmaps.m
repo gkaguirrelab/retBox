@@ -6,11 +6,9 @@ function avgPRFmaps(params)
 %       avgPRFmaps(params)
 %
 %   Required:
-%       params.sessionDir       - '/full/path/to/sessionDir'
-%       params.baseName         - base name of files (e.g. 'lh')
-%
-%   Defaults:
-%       params.outDir           - fullfile(params.sessionDir,'pRFmaps');
+%       params.inDir            = '/full/path/to/inputDir'
+%       params.outDir           = '/full/path/to/outputDir'
+%       params.baseName         = base name of files (e.g. 'lh')
 %
 %   Outputs:
 %       fullfile(outDir,[params.baseName '.ecc.nii.gz'])
@@ -27,26 +25,27 @@ function avgPRFmaps(params)
 %   Written by Andrew S Bock Nov 2016
 
 %% Set defaults
-if ~isfield(params,'outDir');
-    params.outDir   = fullfile(params.sessionDir,'pRFmaps');
-end
 if ~exist(params.outDir,'dir')
     mkdir(params.outDir);
 end
+mapNames            = {'ecc','pol','sig','co'};
 %% load the data
-d = listdir(fullfile(params.sessionDir,'*tfMRI_RETINO*'),'dirs');
-for i = 1:length(d)
-    thisDir         = fullfile(params.sessionDir,d{i});
-    % load the data
-    inEcc           = load_nifti(fullfile(thisDir,[params.baseName '.ecc.nii.gz']));
-    inPol           = load_nifti(fullfile(thisDir,[params.baseName '.pol.nii.gz']));
-    inSig           = load_nifti(fullfile(thisDir,[params.baseName '.sig.nii.gz']));
-    inCo            = load_nifti(fullfile(thisDir,[params.baseName '.co.nii.gz']));
-    % add to matrix
-    ecc(i,:)        = inEcc.vol(:);
-    pol(i,:)        = inPol.vol(:);
-    sig(i,:)        = inSig.vol(:);
-    co(i,:)         = inCo.vol(:);
+for i = 1:length(mapNames)
+    f                   = listdir(fullfile(params.inDir,[params.baseName '*' mapNames{i} '*']),'files');
+    for j = 1:length(f)
+        thisFile        = load_nifti(fullfile(params.inDir,f{j}));
+        % add to matrix
+        switch mapNames{i}
+            case 'ecc'
+                ecc(j,:)        = thisFile.vol(:);
+            case 'pol'
+                pol(j,:)        = thisFile.vol(:);
+            case 'sig'
+                sig(j,:)        = thisFile.vol(:);
+            case 'co'
+                co(j,:)         = thisFile.vol(:);
+        end
+    end
 end
 %% Save out the average maps
 % calculate mean
@@ -55,11 +54,11 @@ avgPol              = circ_mean(pol);
 avgSig              = mean(sig);
 avgCo               = mean(fisher_z_corr(co));
 % save maps
-inEcc.vol           = avgEcc';
-save_nifti(inEcc,fullfile(params.outDir,[params.baseName '.ecc.nii.gz']));
-inPol.vol           = avgPol';
-save_nifti(inPol,fullfile(params.outDir,[params.baseName '.pol.nii.gz']));
-inSig.vol           = avgSig';
-save_nifti(inSig,fullfile(params.outDir,[params.baseName '.sig.nii.gz']));
-inCo.vol            = avgCo';
-save_nifti(inCo,fullfile(params.outDir,[params.baseName '.co.nii.gz']));
+thisFile.vol           = avgEcc';
+save_nifti(thisFile,fullfile(params.outDir,[params.baseName '.ecc.nii.gz']));
+thisFile.vol           = avgPol';
+save_nifti(thisFile,fullfile(params.outDir,[params.baseName '.pol.nii.gz']));
+thisFile.vol           = avgSig';
+save_nifti(thisFile,fullfile(params.outDir,[params.baseName '.sig.nii.gz']));
+thisFile.vol            = avgCo';
+save_nifti(thisFile,fullfile(params.outDir,[params.baseName '.co.nii.gz']));
