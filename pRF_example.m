@@ -45,3 +45,11 @@ for i = 1:length(b)
         surface_plot('sig',sig,subjectName);
     end
 end
+
+%% Average the output pRF maps
+params.inDir            = fullfile(params.sessionDir,'pRFs');
+params.outDir           = fullfile(params.sessionDir,'pRFs');
+for i = 1:length(hemis)
+    params.baseName     = hemis{i};
+    avgPRFmaps(params)
+end
