@@ -5,14 +5,14 @@
 %   Written by Andrew S Bock Oct 2016
 
 %% Run on the UPenn cluster
-params.sessionDir       = '/data/jag/TOME/TOME_3005/100316';
+params.sessionDir       = '/data/jag/TOME/TOME_3003/091616';
 params.logDir           = '/data/jag/TOME/LOGS';
-makePRFshellScripts(params)
+makePRFshellScripts(params);
 
 %% Run locally
 % Set inputs
-subjectName             = 'TOME_3001';
-params.sessionDir       = '/data/jag/TOME/TOME_3001/081916b';
+subjectName             = 'TOME_3003';
+params.sessionDir       = '/data/jag/TOME/TOME_3003/091616';
 params.outDir           = fullfile(params.sessionDir,'pRFs');
 hemis                   = {'lh','rh'};
 % Get the retinotopy runs and stimulus files

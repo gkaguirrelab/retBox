@@ -11,7 +11,7 @@ function makePRFsubmit(params)
 %       params.logDir       - '/full/path/to/logDir'
 %
 %   Defaults:
-%       params.mem          - 40; % GB of memory requested
+%       params.mem          - 30; % GB of memory requested
 %
 %   Outputs:
 %       fullfile(params.scriptDir,params.submitName)
@@ -21,7 +21,7 @@ function makePRFsubmit(params)
 
 %% Set defaults
 if ~isfield(params,'mem')
-    params.mem      = 50;
+    params.mem      = 30;
 end
 %% Get the job scripts
 jobNames            = listdir(fullfile(params.scriptDir,'*.sh'),'files');

@@ -21,10 +21,13 @@ function makePRFshellScripts(params)
 %% Set defaults
 hemis                   = {'lh','rh'};
 params.submitName       = 'submitPRFs.sh';
-
+% script directory
 if ~isfield(params,'scriptDir')
     params.scriptDir    = fullfile(params.sessionDir,'pRF_scripts');
 end
+system(['rm -rf ' params.scriptDir]);
+mkdir(params.scriptDir);
+% output directory for pRF data
 if ~isfield(params,'outDir')
     params.outDir       = fullfile(params.sessionDir,'pRFs');
 end
