@@ -21,6 +21,21 @@ function pRFs = makePRFmaps(params)
 
 %% load the data
 ims                     = load(params.stimFile);
+if isfield(ims.params,'framesPerTR')
+    params.framesPerTR  = ims.params.framesPerTR;
+end
+if isfield(ims.params,'fieldSize')
+    params.fieldSize    = ims.params.fieldSize;
+end
+if isfield(ims.params,'TR')
+    params.TR           = ims.params.TR;
+end
+if isfield(ims.params,'sigList')
+    params.sigList      = ims.params.sigList;
+end
+if isfield(ims.params,'gridPoints')
+    params.gridPoints   = ims.params.gridPoints;
+end
 params.stimData         = ims.params.stimParams.imagesFull;
 tcs                     = load_nifti(params.inVol);
 dims                    = size(tcs.vol);
