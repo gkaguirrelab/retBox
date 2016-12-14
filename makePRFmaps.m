@@ -21,20 +21,33 @@ function pRFs = makePRFmaps(params)
 
 %% load the data
 ims                     = load(params.stimFile);
-if isfield(ims.params,'framesPerTR')
-    params.framesPerTR  = ims.params.framesPerTR;
+% Radius of stimuluated visual field (degrees visual angle)
+if ~isfield(params,'fieldSize')
+    params.fieldSize    = 10.4346;
 end
-if isfield(ims.params,'fieldSize')
-    params.fieldSize    = ims.params.fieldSize;
+% Padding outside of the stimulated visual field
+if ~isfield(params,'padFactor')
+    params.padFactor    = 0.25;
 end
-if isfield(ims.params,'TR')
-    params.TR           = ims.params.TR;
+% Frames per TR
+if ~isfield(params,'framesPerTR')
+    params.framesPerTR  = 8;
 end
-if isfield(ims.params,'sigList')
-    params.sigList      = ims.params.sigList;
+% Search grid points
+if ~isfield(params,'gridPoints')
+    params.gridPoints   = 101;
 end
-if isfield(ims.params,'gridPoints')
-    params.gridPoints   = ims.params.gridPoints;
+% List of sigma values (degrees visual angle)
+if ~isfield(params,'sigList')
+    params.sigList      = 0.5:0.5:10;
+end
+% TR
+if ~isfield(params,'TR')
+    params.TR           = 0.8;
+end
+% HRF
+if ~isfield(params,'HRF')
+    params.HRF          = doubleGammaHrf(params.TR);
 end
 params.stimData         = ims.params.stimParams.imagesFull;
 tcs                     = load_nifti(params.inVol);
