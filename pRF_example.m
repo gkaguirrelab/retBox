@@ -14,6 +14,10 @@ makePRFshellScripts(params);
 subjectName             = 'TOME_3003';
 params.sessionDir       = '/data/jag/TOME/TOME_3003/091616';
 params.outDir           = fullfile(params.sessionDir,'pRFs');
+params.fieldSize        = 10.4346; % Radius of stimuluated visual field (degrees visual angle)
+params.framesPerTR      = 8; % Frames per TR
+params.sigList          = 0.5:0.5:10; % List of sigma values (degrees visual angle)
+params.TR               = 0.8; % TR
 hemis                   = {'lh','rh'};
 % Get the retinotopy runs and stimulus files
 b                       = listdir(fullfile(params.sessionDir,'*RETINO*'),'dirs');
