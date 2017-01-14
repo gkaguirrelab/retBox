@@ -17,6 +17,7 @@ function pRFs = pRF(params)
 %       params.sigList      = 0.5:0.5:10;                   % List of sigma values (degrees visual angle)
 %       params.TR           = 0.8;                          % TR
 %       params.HRF          = doubleGammaHrf(params.TR);    % HRF
+%       params.useVA        = 0;                            % use visual angle
 %
 %   Outputs:
 %       pRF.x0              - x position
@@ -57,6 +58,10 @@ end
 if ~isfield(params,'HRF')
     params.HRF          = doubleGammaHrf(params.TR);
 end
+% use visual angle
+if ~isfield(params,'useVA')
+    params.useVA        = 0;
+end
 %% Binarize the stimulus
 disp('Binarizing the stimulus images...');
 stim                    = 0.*params.stimData;
@@ -71,7 +76,7 @@ for i = 1:length(start)
     meanImages(:,:,i) = mean(stim(:,:,start(i):stop(i)),3);
 end
 %% Calculate the visual angle, update images
-if params.useVisualAngle
+if params.useVA
     [vX,vY] = calcScreenVisualAngle(params);
     [Xq,Yq] = meshgrid(...
         linspace(min(vX(:)),max(vX(:)),length(vX)),...
