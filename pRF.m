@@ -70,6 +70,18 @@ meanImages              = nan(size(stim,1),size(stim,2),size(stim,3)/params.fram
 for i = 1:length(start)
     meanImages(:,:,i) = mean(stim(:,:,start(i):stop(i)),3);
 end
+%% Calculate the visual angle, update images
+if params.useVisualAngle
+    [vX,vY] = calcScreenVisualAngle(params);
+    [Xq,Yq] = meshgrid(...
+        linspace(min(vX(:)),max(vX(:)),length(vX)),...
+        linspace(min(vY(:)),max(vY(:)),length(vY)));
+    nImages = size(meanImages, 3);
+    for ii = 1:nImages
+        V = squeeze(meanImages(:,:,ii));
+        meanImages(:,:,ii) = interp2(vX,vY,V,Xq,Yq);
+    end
+end
 %% Add black around stimulus region, to model the actual visual field (not just the bars)
 disp('Padding the stimulus images...');
 padImages = padarray(meanImages,(params.padFactor/2)*[size(meanImages,1) size(meanImages,2)]);
